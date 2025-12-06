@@ -1,11 +1,16 @@
-<script setup></script>
+<script setup>
+import { getCategory } from '@/apis/testAPI'
+import { onMounted } from 'vue';
+onMounted(async () => {
+  const res = await getCategory()
+  console.log(res);
+})
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <el-button type="primary">主色按钮</el-button>
+  <el-button type="success">成功按钮</el-button>
+
 </template>
 
 <style scoped></style>
