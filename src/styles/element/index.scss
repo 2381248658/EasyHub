@@ -1,0 +1,33 @@
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      // EasyHub 核心主色：科技蓝
+      'base': #007aff,
+      // 补充 Element Plus 组件所需的颜色阶梯
+      'light-3': #409eff,
+      // 浅色变体
+      'light-5': #79bbff,
+      'light-7': #a0cfff,
+      'light-8': #c6e2ff,
+      'light-9': #ecf5ff,
+      'dark-2': #3375b9,
+      // 深色变体
+    ),
+    'success': (
+      // 成功色
+      'base': #34c759,
+    ),
+    'warning': (
+      // 警告色/促销色
+      'base': #ffb302,
+    ),
+    'danger': (
+      // 危险色/价格色（使用 #cf4444）
+      'base': #cf4444,
+    ),
+    'error': (
+      // 错误色
+      'base': #cf4444,
+    ),
+  ) // 保持 Element Plus 的文本和边框等其他变量不变，除非有明确需求
+);
