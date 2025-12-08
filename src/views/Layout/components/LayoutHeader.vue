@@ -1,77 +1,137 @@
+<script setup>
+import { getCategoryAPI } from '@/apis/layoutAPI';
+import { onMounted, ref } from 'vue';
+
+const getCategoryList = ref([])
+const getCategory = async () => {
+  const res = await getCategoryAPI()
+  getCategoryList.value = res.data.result
+}
+onMounted(() => {
+  getCategory()
+})
+
+</script>
+
 <template>
-  <header class="header-main">
-    <div class="header-cotainer">
+  <header class='app-header'>
+    <div class="container">
       <h1 class="logo">
-        <a href="/">EasyHub</a>
+        <RouterLink to="/">EasyHub</RouterLink>
       </h1>
-      <ul class="header-title">
-        <li><a href="#">居家</a></li>
-        <li><a href="#">美食</a></li>
-        <li><a href="#">服饰</a></li>
-        <li><a href="#">母婴</a></li>
-        <li><a href="#">个护</a></li>
-        <li><a href="#">严选</a></li>
-        <li><a href="#">数码</a></li>
-        <li><a href="#">运动</a></li>
-        <li><a href="#">杂项</a></li>
+      <ul class="app-header-nav">
+        <li class="home" v-for="item in getCategoryList" :key="item.id">
+          <RouterLink to="/">{{ item.name }}</RouterLink>
+        </li>
       </ul>
+      <div class="search">
+        <i class="iconfont icon-sousuo"></i>
+        <input type="text" placeholder="搜一搜">
+      </div>
+      <!-- 头部购物车 -->
+
     </div>
   </header>
 </template>
 
-<style lang="scss" scoped>
-.header-main {
-  width: 1240px;
-  height: 132px;
-  margin: 0 auto;
-  // 显示页面区域需要 完成时删去
-  background-color: skyblue;
-}
 
-.header-cotainer {
-  display: flex;
-  align-items: center;
-  /* 确保它撑满了父容器的高度 */
-  height: 100%;
-}
+<style scoped lang='scss'>
+.app-header {
+  background: #fff;
 
-.logo {
-  width: 200px;
-  height: 100%; // 继承 header-main 的高度
-
-  a {
-    display: block;
-    height: 100%;
-    width: 100%;
-
-    text-indent: -9999px;
-    background: url('@/assets/images/logo.png') no-repeat center center / contain;
+  .container {
+    display: flex;
+    align-items: center;
   }
-}
 
-.header-title {
-  display: flex;
-  width: 820px;
-  padding-left: 40px;
-
-  li {
-    margin-right: 40px;
-    width: 38px;
-    text-align: center;
-    list-style-type: none;
+  .logo {
+    width: 200px;
 
     a {
-      font-size: 16px;
-      line-height: 32px;
-      height: 32px;
-      display: inline-block;
-      // ⚠️ 补充：移除下划线
-      text-decoration: none;
-      color: #333;
+      display: block;
+      height: 132px;
+      width: 100%;
+      text-indent: -9999px;
+      background: url('@/assets/images/logo.png') no-repeat center 18px / contain;
+    }
+  }
 
-      &:hover {
+  .app-header-nav {
+    width: 820px;
+    display: flex;
+    padding-left: 40px;
+    position: relative;
+    z-index: 998;
+
+    li {
+      margin-right: 40px;
+      width: 38px;
+      text-align: center;
+
+      a {
+        font-size: 16px;
+        line-height: 32px;
+        height: 32px;
+        display: inline-block;
+
+        &:hover {
+          color: $xtxColor;
+          border-bottom: 1px solid $xtxColor;
+        }
+      }
+
+      .active {
         color: $xtxColor;
         border-bottom: 1px solid $xtxColor;
+      }
+    }
+  }
+
+  .search {
+    width: 170px;
+    height: 32px;
+    position: relative;
+    border-bottom: 1px solid #e7e7e7;
+    line-height: 32px;
+
+    .icon-search {
+      font-size: 18px;
+      margin-left: 5px;
+    }
+
+    input {
+      width: 140px;
+      padding-left: 5px;
+      color: #666;
+    }
+  }
+
+  .cart {
+    width: 50px;
+
+    .curr {
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      position: relative;
+      display: block;
+
+      .icon-cart {
+        font-size: 22px;
+      }
+
+      em {
+        font-style: normal;
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 1px 6px;
+        line-height: 1;
+        background: $helpColor;
+        color: #fff;
+        font-size: 12px;
+        border-radius: 10px;
+        font-family: Arial;
       }
     }
   }

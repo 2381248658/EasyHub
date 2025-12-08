@@ -36,6 +36,7 @@ export default defineConfig({
         additionalData: `
           @use "@/styles/element/index.scss" as *;
           @use "@/styles/var.scss" as *;  // 自动导入自定义主题变量
+          @use "@/styles/common.scss" as *;
         `,
       },
     },
