@@ -1,16 +1,6 @@
 <script setup>
-import { getCategoryAPI } from '@/apis/layoutAPI';
-import { onMounted, ref } from 'vue';
-
-const getCategoryList = ref([])
-const getCategory = async () => {
-  const res = await getCategoryAPI()
-  getCategoryList.value = res.data.result
-}
-onMounted(() => {
-  getCategory()
-})
-
+import { useCategoryStore } from '@/stores/category';
+const categoryStore = useCategoryStore()
 </script>
 
 <template>
@@ -20,7 +10,7 @@ onMounted(() => {
         <RouterLink to="/">EasyHub</RouterLink>
       </h1>
       <ul class="app-header-nav">
-        <li class="home" v-for="item in getCategoryList" :key="item.id">
+        <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">
           <RouterLink to="/">{{ item.name }}</RouterLink>
         </li>
       </ul>
