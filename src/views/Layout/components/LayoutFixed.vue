@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
 import { useCategoryStore } from '@/stores/category'
+import { ref, onMounted, onUnmounted } from 'vue'
 // 定义是否展示 和展示的距离
 const showStick = ref(false)
 const offsetTop = 80
@@ -28,7 +28,7 @@ const categoryStore = useCategoryStore()
       <!-- 导航区域 -->
       <ul class="app-header-nav ">
         <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">
-          <RouterLink to="/">{{ item.name }}</RouterLink>
+          <RouterLink :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
         </li>
       </ul>
 
