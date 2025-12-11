@@ -22,7 +22,7 @@ onMounted(() => getBanner())
   </div>
 
 </template>
-<style>
+<style lang="scss" scoped>
 .home-banner {
   width: 1240px;
   height: 500px;

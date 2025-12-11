@@ -1,19 +1,13 @@
 <script setup>
-import { getCategoryAPI } from '@/apis/category'
-import { useRoute } from 'vue-router';
-import { onMounted, ref } from 'vue';
-
-const categoryData = ref({})
-const route = useRoute()
-const category = async () => {
-  try {
-    const res = await getCategoryAPI(route.params.id)
-    categoryData.value = res.data.result
-  } catch (err) {
-    console.error('面包屑导航获取失败', err)
-  }
-}
-onMounted(() => category())
+import GoodsItem from '../Home/components/GoodsItem.vue';
+// 引入banner逻辑封装
+import { useBanner } from './composables/useBanner';
+// 引入category逻辑封装
+import { useCategory } from './composables/useCategory';
+// 使用解构赋值调回所需数据
+const { bannerList } = useBanner()
+const { categoryData } = useCategory()
+// console.log(categoryData.name)
 </script>
 
 <template>
@@ -25,6 +19,34 @@ onMounted(() => category())
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>{{ categoryData.name }}</el-breadcrumb-item>
         </el-breadcrumb>
+      </div>
+      <!-- 轮播图 -->
+      <div class="home-banner">
+        <el-carousel height="500px">
+          <el-carousel-item v-for="item in bannerList" :key="item.id">
+            <img :src="item.imgUrl" alt="">
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+      <!-- 导航区域的列表实现 -->
+      <div class="sub-list">
+        <h3>全部分类</h3>
+        <ul>
+          <li v-for="i in categoryData.children" :key="i.id">
+            <RouterLink :to="`/category/sub/${i.id}`">
+              <img :src="i.picture" />
+              <p>{{ i.name }}</p>
+            </RouterLink>
+          </li>
+        </ul>
+      </div>
+      <div class="ref-goods" v-for="item in categoryData.children" :key="item.id">
+        <div class="head">
+          <h3>- {{ item.name }}-</h3>
+        </div>
+        <div class="body">
+          <GoodsItem v-for="good in item.goods" :good="good" :key="good.id" />
+        </div>
       </div>
     </div>
   </div>
@@ -107,6 +129,20 @@ onMounted(() => category())
 
   .bread-container {
     padding: 25px 0;
+  }
+}
+
+.home-banner {
+  width: 1240px;
+  height: 500px;
+  // position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 98;
+
+  img {
+    width: 100%;
+    height: 500px;
   }
 }
 </style>
