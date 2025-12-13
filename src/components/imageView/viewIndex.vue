@@ -1,4 +1,7 @@
 <script setup>
+import { ref, watch } from 'vue';
+import { useMouseInElement } from '@vueuse/core';
+
 // 图片列表
 const imageList = [
   "https://yanxuan-item.nosdn.127.net/d917c92e663c5ed0bb577c7ded73e4ec.png",
@@ -7,6 +10,52 @@ const imageList = [
   "https://yanxuan-item.nosdn.127.net/f93243224dc37674dfca5874fe089c60.jpg",
   "https://yanxuan-item.nosdn.127.net/f881cfe7de9a576aaeea6ee0d1d24823.jpg"
 ]
+
+// 1.实现大小图切换
+// 2.实现放大镜功能
+// 3.渲染数据
+// 1.
+const activeIndex = ref(0)
+const SwitchImageSize = (i) => {
+  activeIndex.value = i
+}
+// 2.
+// 安装库 vueuse 使用里面的函数useMouseInElement
+//大图容器
+const target = ref(null)
+// 获取鼠标相对位置
+const { elementX, elementY, isOutside } = useMouseInElement(target)
+// 浮块位置
+const left = ref(0)
+const top = ref(0)
+// 放大镜大图背景位置
+const positionX = ref(0)
+const positionY = ref(0)
+
+// 容器和浮块尺寸（可调整）
+const containerWidth = 400
+const containerHeight = 400
+const layerWidth = 200
+const layerHeight = 200
+const zoom = 2 // 放大倍数
+
+// 监听鼠标变化,计算浮块位置和大图偏移
+watch([elementX, elementY, isOutside], () => {
+  // 鼠标离开图片位置,浮块隐藏
+  if (isOutside.value) {
+    left.value = 0 // 离开时重置浮块位置
+    top.value = 0
+    return
+  }
+  // 计算浮块左上角位置, 鼠标坐标-浮块一半位置
+  left.value = Math.min(Math.max(elementX.value - layerWidth / 2, 0), containerWidth - layerWidth)
+  top.value = Math.min(Math.max(elementY.value - layerHeight / 2, 0), containerHeight - layerHeight)
+
+  // 大图背景偏移 = -浮块位置 * 放大倍数
+  positionX.value = -left.value * zoom
+  positionY.value = -top.value * zoom
+})
+
 </script>
 
 
@@ -14,24 +63,26 @@ const imageList = [
   <div class="goods-image">
     <!-- 左侧大图-->
     <div class="middle" ref="target">
-      <img :src="imageList[0]" alt="" />
+      <img :src="imageList[activeIndex]" alt="" />
       <!-- 蒙层小滑块 -->
-      <div class="layer" :style="{ left: `0px`, top: `0px` }"></div>
+      <div class="layer" v-show="!isOutside" :style="{ left: left + `px`, top: top + `px` }"></div>
     </div>
     <!-- 小图列表 -->
     <ul class="small">
-      <li v-for="(img, i) in imageList" :key="i">
+      <li v-for="(img, i) in imageList" :key="i" @mouseenter="SwitchImageSize(i)"
+        :class="{ active: i === activeIndex }">
         <img :src="img" alt="" />
       </li>
     </ul>
     <!-- 放大镜大图 -->
     <div class="large" :style="[
       {
-        backgroundImage: `url(${imageList[0]})`,
-        backgroundPositionX: `0px`,
-        backgroundPositionY: `0px`,
+        backgroundImage: `url(${imageList[activeIndex]})`,
+        backgroundPositionX: positionX + `px`,
+        backgroundPositionY: positionY + `px`,
+        backgroundSize: containerWidth * zoom + 'px ' + containerHeight * zoom + 'px'
       },
-    ]" v-show="false"></div>
+    ]" v-show="!isOutside"></div>
   </div>
 </template>
 
@@ -42,12 +93,21 @@ const imageList = [
   position: relative;
   display: flex;
 
+  /* 大图区域 */
   .middle {
     width: 400px;
     height: 400px;
     background: #f5f5f5;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
+  /* 放大镜大图 */
   .large {
     position: absolute;
     top: 0;
@@ -57,34 +117,43 @@ const imageList = [
     z-index: 500;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-repeat: no-repeat;
-    // 背景图:盒子的大小 = 2:1  将来控制背景图的移动来实现放大的效果查看 background-position
-    background-size: 800px 800px;
     background-color: #f8f8f8;
   }
 
+  /* 浮块 */
   .layer {
     width: 200px;
     height: 200px;
     background: rgba(0, 0, 0, 0.2);
-    // 绝对定位 然后跟随咱们鼠标控制left和top属性就可以让滑块移动起来
+    position: absolute;
     left: 0;
     top: 0;
-    position: absolute;
+    cursor: move;
   }
 
+  /* 小图列表 */
   .small {
-    width: 80px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
 
     li {
       width: 68px;
       height: 68px;
-      margin-left: 12px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       cursor: pointer;
+      border: 2px solid transparent;
 
-      &:hover,
-      &.active {
-        border: 2px solid $xtxColor;
+      &.active,
+      &:hover {
+        border-color: #f56c6c;
+        /* 可自定义高亮颜色 */
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
   }
