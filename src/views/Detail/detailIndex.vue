@@ -2,12 +2,13 @@
 import { getDetail } from '@/apis/detail';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import DetailHot from './components/DetailHot.vue';
 const goods = ref({})
 const route = useRoute()
 const getGoods = async () => {
   try {
     const res = await getDetail(route.params.id)
-    console.log('当前商品数据：', res.data.result)
+    // console.log('当前商品数据：', res.data.result)
     goods.value = res.data.result
   } catch (err) {
     console.error('获取商品详细信息失败', err)
@@ -119,7 +120,8 @@ onMounted(() => getGoods())
             </div>
             <!-- 24热榜+专题推荐 -->
             <div class="goods-aside">
-
+              <DetailHot :hot-type="1" />
+              <DetailHot :hot-type="2" />
             </div>
           </div>
         </div>
