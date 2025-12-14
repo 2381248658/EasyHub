@@ -1,14 +1,19 @@
 <script setup>
 import { ref } from 'vue';
-
+import { loginAPI } from '@/apis/user';
+import 'element-plus/theme-chalk/el-message.css'
+import { ElMessage } from 'element-plus';
+import router from '@/router';
+import { useUserStore } from '@/stores/user';
+const userStore = useUserStore()
 const formRef = ref(null)
 const form = ref({
-  username: '',
-  password: '',
-  agree: false
+  account: 'cdshi0088',
+  password: '123456',
+  agree: true
 })
 const rules = {
-  username: [
+  account: [
     { required: true, message: '用户名不能为空', trigger: 'blur' }
   ],
   password: [
@@ -29,13 +34,17 @@ const rules = {
   ]
 }
 const doLogin = () => {
+  const { account, password } = form.value
   // 调用实例方法
-  formRef.value.validator((valid) => {
+  formRef.value.validate(async (valid) => {
     //valid:所有项表单都通过校验才为true
     if (valid) {
-      // 提交表单
-    } else {
-      //
+      // 调用
+      await userStore.getUserInfo({ account, password })
+      const res = await loginAPI({ account, password })
+      console.log(res);
+      ElMessage({ type: 'success', message: '登录成功' })
+      router.replace({ path: '/' })
     }
   })
 }
@@ -64,8 +73,8 @@ const doLogin = () => {
         <div class="account-box">
           <div class="form">
             <el-form ref="formRef" :model="form" :rules="rules" label-position="right" label-width="60px" status-icon>
-              <el-form-item label="账户" prop="username">
-                <el-input v-model="form.username" type="text" placeholder="请输入用户名" />
+              <el-form-item label="账户" prop="account">
+                <el-input v-model="form.account" type="text" placeholder="请输入用户名" />
               </el-form-item>
               <el-form-item label="密码" prop="password">
                 <el-input v-model="form.password" type="password" placeholder="请输入密码" />
