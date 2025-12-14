@@ -1,11 +1,24 @@
+<script setup>
+import { useUserStore } from '@/stores/user';
+import { useRouter } from 'vue-router';
+const userStore = useUserStore()
+const router = useRouter()
+const confirm = () => {
+  console.log('用户要退出登录了');
+  // 清除用户信息
+  userStore.clearUserInfo()
+  // 跳转登录页
+  router.replace('/login')
+}
+</script>
 <template>
   <nav class="app-topnav">
     <div class="container">
       <ul>
-        <template v-if="false">
-          <li><a href="javascript:;"><i class="iconfont icon-yonghu"></i>周杰伦</a></li>
+        <template v-if="userStore.userInfo.token">
+          <li><a href="javascript:;"><i class="iconfont icon-yonghu"></i>{{ userStore.userInfo.nickname }}</a></li>
           <li>
-            <el-popconfirm title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
+            <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
               <template #reference>
                 <a href="javascript:;">退出登录</a>
               </template>
