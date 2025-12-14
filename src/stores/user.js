@@ -15,10 +15,13 @@ export const useUserStore = defineStore(
       // console.log('接口返回完整数据：', res)
       userInfo.value = res.data.result
     }
-
+    const clearUserInfo = () => {
+      userInfo.value = {}
+    }
     return {
       userInfo,
       getUserInfo,
+      clearUserInfo,
     }
   },
   {
