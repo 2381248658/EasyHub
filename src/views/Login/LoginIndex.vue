@@ -4,7 +4,7 @@ import { loginAPI } from '@/apis/user';
 import 'element-plus/theme-chalk/el-message.css'
 import { ElMessage } from 'element-plus';
 import router from '@/router';
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from '@/stores/userStore';
 const userStore = useUserStore()
 const formRef = ref(null)
 const form = ref({

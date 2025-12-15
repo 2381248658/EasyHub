@@ -1,5 +1,5 @@
 <script setup>
-import { useCategoryStore } from '@/stores/category'
+import { useCategoryStore } from '@/stores/categoryStore'
 import { ref, onMounted, onUnmounted } from 'vue'
 // 定义是否展示 和展示的距离
 const showStick = ref(false)
