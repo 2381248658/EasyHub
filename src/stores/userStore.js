@@ -2,6 +2,8 @@
 import { defineStore } from 'pinia'
 import { loginAPI } from '@/apis/user'
 import { ref } from 'vue'
+import { useCartStore } from './cartStore'
+import { mergeCartAPI } from '@/apis/carts'
 
 export const useUserStore = defineStore(
   'user',
@@ -10,13 +12,28 @@ export const useUserStore = defineStore(
     const userInfo = ref({})
     // 2.定义获取接口数据的action函数
     const getUserInfo = async ({ account, password }) => {
+      const cartStore = useCartStore()
       // console.log('请求参数：', { account, password })
       const res = await loginAPI({ account, password })
       // console.log('接口返回完整数据：', res)
       userInfo.value = res.data.result
+
+      // 合并购物车操作
+      await mergeCartAPI(
+        cartStore.cartList.map((item) => {
+          return {
+            skuId: item.skuId,
+            selected: item.selected,
+            count: item.count,
+          }
+        }),
+      )
+      cartStore.updateNewCart()
     }
     const clearUserInfo = () => {
+      const cartStore = useCartStore()
       userInfo.value = {}
+      cartStore.clearCart()
     }
     return {
       userInfo,
