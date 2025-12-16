@@ -28,7 +28,7 @@ const countChange = (count) => {
 // sku规格被操作时
 let skuObj = {}
 const skuChange = (sku) => {
-  console.log(sku);
+  // console.log(sku);
   skuObj = sku
 }
 
