@@ -41,12 +41,13 @@ export const mergeCartAPI = (data) => {
 }
 
 // 单选更新登录购物车
-export const updateNewCartAPI = (skuId, data) => {
+export const updateNewCartAPI = (skuId, { selected, count }) => {
   return httpInstance({
     url: `member/cart/${skuId}`,
     method: 'PUT',
     data: {
-      data,
+      selected,
+      count,
     },
   })
 }

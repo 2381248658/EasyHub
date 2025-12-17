@@ -1,7 +1,42 @@
 <script setup>
-const checkInfo = {}  // 订单对象
-const curAddress = {}  // 地址对象
+import { getCheckoutInfoAPI } from '@/apis/checkout';
+import { onMounted, ref } from 'vue';
+const checkInfo = ref({})  // 订单对象
+const curAddress = ref({})  // 地址对象
+const getCheckoutInfo = async () => {
+  try {
+    const res = await getCheckoutInfoAPI()
+    checkInfo.value = res.data.result
+    console.log(res.data.result);
+    // 获取地址
+    const address = checkInfo.value.userAddresses.find(address => address.isDefault === 0)
+    curAddress.value = address
+  } catch (err) {
+    console.log('获取详情失败', err);
+  }
+}
+onMounted(() => getCheckoutInfo())
 
+// 控制弹框打开
+const toggleFlag = ref(false)
+// 记录当前选中的地址项
+const activeAddress = ref({})
+// 切换地址的点击回调
+const switchAddress = (item) => {
+  activeAddress.value = item
+}
+// 确定按钮
+const confirm = () => {
+  curAddress.value = activeAddress.value
+  toggleFlag.value = false // 关闭弹窗
+}
+
+// 取消按钮
+const handleCancel = () => {
+  toggleFlag.value = false
+  // 可选：将弹窗内的选中项重置为当前页面显示的地址
+  activeAddress.value = curAddress.value
+}
 </script>
 
 <template>
@@ -21,7 +56,7 @@ const curAddress = {}  // 地址对象
               </ul>
             </div>
             <div class="action">
-              <el-button size="large" @click="toggleFlag = true">切换地址</el-button>
+              <el-button size="large" @click="toggleFlag = true; activeAddress = curAddress">切换地址</el-button>
               <el-button size="large" @click="addFlag = true">添加地址</el-button>
             </div>
           </div>
@@ -102,6 +137,24 @@ const curAddress = {}  // 地址对象
     </div>
   </div>
   <!-- 切换地址 -->
+  <el-dialog title="切换收货地址" width="40%" center v-model="toggleFlag">
+    <div class="addressWrapper">
+      <div class="text item" v-for="item in checkInfo.userAddresses" :key="item.id" @click="switchAddress(item)"
+        :class="{ active: activeAddress.id === item.id }">
+        <ul>
+          <li><span>收<i />货<i />人：</span>{{ item.receiver }} </li>
+          <li><span>联系方式：</span>{{ item.contact }}</li>
+          <li><span>收货地址：</span>{{ item.fullLocation + item.address }}</li>
+        </ul>
+      </div>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" @click="confirm" :disabled="!activeAddress.id">确定</el-button>
+      </span>
+    </template>
+  </el-dialog>
   <!-- 添加地址 -->
 </template>
 
