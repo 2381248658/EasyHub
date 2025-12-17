@@ -1,6 +1,8 @@
 <script setup>
-import { getCheckoutInfoAPI } from '@/apis/checkout';
+import { getCheckoutInfoAPI, createOrderAPI } from '@/apis/checkout';
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter()
 const checkInfo = ref({})  // 订单对象
 const curAddress = ref({})  // 地址对象
 const getCheckoutInfo = async () => {
@@ -36,6 +38,34 @@ const handleCancel = () => {
   toggleFlag.value = false
   // 可选：将弹窗内的选中项重置为当前页面显示的地址
   activeAddress.value = curAddress.value
+}
+
+// 创建订单
+const createOrder = async () => {
+  try {
+    const res = await createOrderAPI({
+      deliveryTimeType: 1,
+      payType: 1,
+      payChannel: 1,
+      buyerMessage: '',
+      goods: checkInfo.value.goods.map(item => {
+        return {
+          skuId: item.skuId,
+          count: item.count
+        }
+      }),
+      addressId: curAddress.value.id
+    })
+    const orderId = res.data.result.id
+    router.push({
+      path: '/pay',
+      query: {
+        id: orderId
+      }
+    })
+  } catch (err) {
+    console.log('创建订单失败', err);
+  }
 }
 </script>
 
@@ -131,7 +161,7 @@ const handleCancel = () => {
         </div>
         <!-- 提交订单 -->
         <div class="submit">
-          <el-button type="primary" size="large">提交订单</el-button>
+          <el-button type="primary" size="large" @click="createOrder">提交订单</el-button>
         </div>
       </div>
     </div>
