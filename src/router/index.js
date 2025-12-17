@@ -7,6 +7,8 @@ import SubCategoryIndex from '@/views/SubCategory/SubCategoryIndex.vue'
 import Detail from '@/views/Detail/detailIndex.vue'
 import CartList from '@/views/CartList/cartListindex.vue'
 import Checkout from '@/views/Checkout/checkoutIndex.vue'
+import Pay from '@/views/Pay/payIndex.vue'
+import PayBack from '@/views/Pay/payBack.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +40,14 @@ const router = createRouter({
         {
           path: 'checkout',
           component: Checkout,
+        },
+        {
+          path: 'pay',
+          component: Pay,
+        },
+        {
+          path: 'paycallback',
+          component: PayBack,
         },
       ],
     },
