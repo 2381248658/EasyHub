@@ -1,7 +1,13 @@
 // 封装购物车数据
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { insertCartAPI, findNewCartListAPI, delCartAPI } from '@/apis/carts'
+import {
+  insertCartAPI,
+  findNewCartListAPI,
+  delCartAPI,
+  updateNewCartAPI,
+  batchUpdateCartAPI,
+} from '@/apis/carts'
 import { useUserStore } from './userStore'
 
 export const useCartStore = defineStore('cart', () => {
@@ -69,10 +75,15 @@ export const useCartStore = defineStore('cart', () => {
   )
 
   // 单选框被选择
-  const singleCheck = (i, selected) => {
+  const singleCheck = async (i, selected) => {
     // 找到被选择的数组元素,改变他的选择状态
     const index = cartList.value.findIndex((goods) => goods.skuId === i.skuId)
     cartList.value[index].selected = selected
+
+    // 如果已经登录 调用接口同步状态
+    if (isLogin.value) {
+      await updateNewCartAPI(i.skuId, { selected })
+    }
   }
 
   // 是否全选
@@ -85,11 +96,16 @@ export const useCartStore = defineStore('cart', () => {
   })
 
   // 全选功能
-  const allCheck = (selected) => {
+  const allCheck = async (selected) => {
     // 把cartList中的每一项的selected都设置为当前的全选框状态
     cartList.value.forEach((item) => {
       item.selected = selected
     })
+    // 如果已经登陆，同步全选状态
+    if (isLogin.value) {
+      const ids = cartList.value.map((item) => item.skuId)
+      await batchUpdateCartAPI({ ids, selected })
+    }
   }
 
   //3. 已选择数量

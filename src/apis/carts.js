@@ -39,3 +39,23 @@ export const mergeCartAPI = (data) => {
     data,
   })
 }
+
+// 单选更新登录购物车
+export const updateNewCartAPI = (skuId, data) => {
+  return httpInstance({
+    url: `member/cart/${skuId}`,
+    method: 'PUT',
+    data: {
+      data,
+    },
+  })
+}
+
+// 全选更新购物车
+export const batchUpdateCartAPI = (data) => {
+  return httpInstance({
+    url: 'member/cart/selected',
+    method: 'PUT',
+    data,
+  })
+}
