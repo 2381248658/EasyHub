@@ -57,11 +57,7 @@ const router = createRouter({
           component: Member,
           children: [
             {
-              path: '', // 匹配 /member (默认显示)
-              component: UserInfo,
-            },
-            {
-              path: 'user', // 匹配 /member/user (解决你的报错)
+              path: '',
               component: UserInfo,
             },
             {

@@ -1,22 +1,68 @@
 <script setup>
+import { getUserOrderAPI } from '@/apis/order';
+import { ref, onMounted } from 'vue';
 // tab列表
 const tabTypes = [
-  { name: "all", label: "全部订单" },
-  { name: "unpay", label: "待付款" },
-  { name: "deliver", label: "待发货" },
-  { name: "receive", label: "待收货" },
-  { name: "comment", label: "待评价" },
-  { name: "complete", label: "已完成" },
-  { name: "cancel", label: "已取消" }
+  { name: "all", label: "全部订单", state: 0 },
+  { name: "unpay", label: "待付款", state: 1 },
+  { name: "deliver", label: "待发货", state: 2 },
+  { name: "receive", label: "待收货", state: 3 },
+  { name: "comment", label: "待评价", state: 4 },
+  { name: "complete", label: "已完成", state: 5 },
+  { name: "cancel", label: "已取消", state: 6 }
 ]
-// 订单列表
-const orderList = []
 
+// 创建格式化函数
+const fomartPayState = (payState) => {
+  const stateMap = {
+    1: '待付款',
+    2: '待发货',
+    3: '待收货',
+    4: '待评价',
+    5: '已完成',
+    6: '已取消'
+  }
+  return stateMap[payState]
+}
+
+// 获取订单列表
+const orderList = ref([])
+// 获取订单总数
+const total = ref(0)
+const params = ref({
+  orderState: 0,
+  page: 1,
+  pageSize: 2
+})
+const getOrderList = async () => {
+  const res = await getUserOrderAPI(params.value)
+  orderList.value = res.data.result
+  total.value = res.data.result.counts
+}
+onMounted(() => getOrderList())
+
+// tab切换
+const tabChange = (tabName) => {
+  // 找到当前Tab对应的数字状态
+  const targetTab = tabTypes.find(item => item.name === tabName);
+  if (targetTab) {
+    params.value.orderState = targetTab.state;
+    params.value.page = 1; // 切换Tab重置页码为第1页
+    getOrderList();
+  }
+}
+
+// 页数切换
+const pageChange = (page) => {
+  console.log(page);
+  params.value.page = page
+  getOrderList()
+}
 </script>
 
 <template>
   <div class="order-container">
-    <el-tabs>
+    <el-tabs @tab-change="tabChange">
       <!-- tab切换 -->
       <el-tab-pane v-for="item in tabTypes" :key="item.name" :label="item.label" />
 
@@ -26,7 +72,7 @@ const orderList = []
         </div>
         <div v-else>
           <!-- 订单列表 -->
-          <div class="order-item" v-for="order in orderList" :key="order.id">
+          <div class="order-item" v-for="order in orderList.items" :key="order.id">
             <div class="head">
               <span>下单时间：{{ order.createTime }}</span>
               <span>订单编号：{{ order.id }}</span>
@@ -57,7 +103,7 @@ const orderList = []
                 </ul>
               </div>
               <div class="column state">
-                <p>{{ order.orderState }}</p>
+                <p>{{ fomartPayState(order.orderState) }}</p>
                 <p v-if="order.orderState === 3">
                   <a href="javascript:;" class="green">查看物流</a>
                 </p>
@@ -93,7 +139,8 @@ const orderList = []
           </div>
           <!-- 分页 -->
           <div class="pagination-container">
-            <el-pagination background layout="prev, pager, next" />
+            <el-pagination :total="total" @current-change="pageChange" :page-size="params.pageSize" background
+              layout="prev, pager, next" />
           </div>
         </div>
       </div>
